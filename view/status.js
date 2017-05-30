@@ -30,6 +30,11 @@ var states = [ 'url', 'login', 'online' ];
 var state = 'url';
 
 var buttons_html="\
+<button class=\"clean\" id=\"print_t\" title=\"Imprimir Factura\">\
+  <span class=\"fa-stack fa-lg\">\
+  <i class=\"fa fa-print fa-stack-2x\"></i>\
+  </span>\
+</button>\
 <button class=\"clean\" id=\"short_test\" title=\"Short Test\">\
   <span class=\"fa-stack fa-lg\">\
   <i class=\"fa fa-file-o fa-stack-2x\"></i>\
@@ -54,31 +59,6 @@ var buttons_html="\
   <i class=\"fa fa-cut fa-stack-1x\"></i>\
   </span>\
 </span>\
-<button class=\"clean\" id=\"open_fiscal_journal\" title=\"Open day\">\
-  <span class=\"fa-stack fa-lg\">\
-  <i class=\"fa fa-file-o fa-stack-2x\"></i>\
-  <i class=\"fa fa-money fa-stack-1x\"></i>\
-  </span>\
-</button>\
-<button class=\"clean\" id=\"close_fiscal_journal\" title=\"Close day\">\
-  <span class=\"fa-stack fa-lg\">\
-  <i class=\"fa fa-file-o fa-stack-2x\"></i>\
-  <i class=\"fa fa-money fa-stack-1x\"></i>\
-  <i class=\"fa fa-ban fa-stack-1x text-danger\"></i>\
-  </span>\
-</button>\
-<button class=\"clean\" id=\"shift_change\" title=\"Change Shifts\">\
-  <span class=\"fa-stack fa-lg\">\
-  <i class=\"fa fa-file-o fa-stack-2x\"></i>\
-  <i class=\"fa fa-exchange fa-stack-1x\"></i>\
-  </span>\
-</button>\
-<button class=\"clean\" id=\"cancel_fiscal_ticket\" title=\"Cancel Ticket\">\
-  <span class=\"fa-stack fa-lg\">\
-  <i class=\"fa fa-file-o fa-stack-1x\"></i>\
-  <i class=\"fa fa-ban fa-stack-2x text-danger\"></i>\
-  </span>\
-</button>\
 ";
 
 // Default values for form.
@@ -260,28 +240,19 @@ function update_view() {
             var getPrinter = function(e) { return session.printers[e.target.parentNode.parentNode.parentNode.parentNode.getAttribute('printer_id')]; };
 
             cell2.childNodes[0].addEventListener('click', function(e) {
-                getPrinter(e).short_test(function(res) { do_printer_alert("Executed short test", res); });
+                getPrinter(e).make_ticket_notacredito(options, ticket, function(res) { console.log(res); });
             });
             cell2.childNodes[1].addEventListener('click', function(e) {
-                getPrinter(e).large_test(function(res) { do_printer_alert("Executed large test.", res); });
+                getPrinter(e).short_test(function(res) { do_printer_alert("Executed short test", res); });
             });
             cell2.childNodes[2].addEventListener('click', function(e) {
-                getPrinter(e).advance_paper(1, function(res) { do_printer_alert("Executed advance paper.", res); });
+                getPrinter(e).large_test(function(res) { do_printer_alert("Executed large test.", res); });
             });
             cell2.childNodes[3].addEventListener('click', function(e) {
-                getPrinter(e).cut_paper(function(res) { do_printer_alert("Executed cut paper.", res); });
+                getPrinter(e).advance_paper(1, function(res) { do_printer_alert("Executed advance paper.", res); });
             });
             cell2.childNodes[4].addEventListener('click', function(e) {
-                getPrinter(e).open_fiscal_journal(function(res) { do_printer_alert("Executed Open day.", res); });
-            });
-            cell2.childNodes[5].addEventListener('click', function(e) {
-                getPrinter(e).close_fiscal_journal(function(res) { do_printer_alert("Executed Close day.", res); });
-            });
-            cell2.childNodes[6].addEventListener('click', function(e) {
-                getPrinter(e).shift_change(function(res) { console.log(res); do_printer_alert("Executed Change Shift.", res); });
-            });
-            cell2.childNodes[7].addEventListener('click', function(e) {
-                getPrinter(e).cancel_fiscal_ticket( function(res) { console.log(res); do_printer_alert("Cancel ticket done.", res); });
+                getPrinter(e).cut_paper(function(res) { do_printer_alert("Executed cut paper.", res); });
             });
     };
     if (printer_table.rows.length == 0) {

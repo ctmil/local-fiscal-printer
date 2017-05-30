@@ -23,11 +23,11 @@ function open_status(sess) {
             chrome.app.window.create('view/status.html', {
                 id: "status",
                 'bounds': {
-                    'width': 750,
-                    'height': 380
+                    'width': 650,
+                    'height': 550
                 },
-                'minWidth': 750,
-                'minHeight': 380
+                'minWidth': 650,
+                'minHeight': 550
             }, function(sWindow) {
               sWindow.contentWindow.session = sess;
             });
