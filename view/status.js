@@ -29,34 +29,74 @@ var local_printers    = document.querySelectorAll(".local_printers");
 var states = [ 'url', 'login', 'online' ];
 var state = 'url';
 
+var options;
+var ticket;
+
+blacklistedIds = ["none"];
+chrome.runtime.onMessageExternal.addListener(
+function(request, sender, sendResponse) {
+  if ("bklfdjdclipbfeelomnppeafeeodcddl" in blacklistedIds) {
+    sendResponse({"result":"sorry, could not process your message"});
+    return;
+  } else if (request.myTicket) {
+    ticket = request.myTicket;
+    options = request.myOption;
+    //Imprimir datos en pantalla
+    var str = JSON.stringify(request.myTicket);
+    str = str.replace(/ *, */g, '\n');
+    str = str.replace(/ *{ */g, '\n');
+    str = str.replace(/ *} */g, '\n');
+    str = str.replace(/ *" */g, '');
+    str = str.replace(/.*:/g, '');
+    str = str.replace(/\[/g, '');
+    str = str.replace(/\]/g, '');
+    str = str.replace(/\n\s*\n/g, '\n\n');
+    str = str.trim();
+    appendLog(str);
+    //Enviar respuesta
+    do_printer_alert("Ticket Obtenido", request);
+    sendResponse({"result":"Ok, got your message"});
+  } else {
+    sendResponse({"result":"Ops, I don't understand this message"});
+  }
+});
+
+///////////////////////////////////////////////////////////////////
+
 var buttons_html="\
 <button class=\"clean\" id=\"print_t\" title=\"Imprimir Factura\">\
   <span class=\"fa-stack fa-lg\">\
   <i class=\"fa fa-print fa-stack-2x\"></i>\
   </span>\
 </button>\
-<button class=\"clean\" id=\"short_test\" title=\"Short Test\">\
+<button class=\"clean\" id=\"short_test\" title=\"Test Corto\">\
   <span class=\"fa-stack fa-lg\">\
   <i class=\"fa fa-file-o fa-stack-2x\"></i>\
   <i class=\"fa fa-gear fa-stack-1x\"></i>\
   </span>\
 </button>\
-<button class=\"clean\" id=\"large_test\" title=\"Large Test\">\
+<button class=\"clean\" id=\"large_test\" title=\"Test Largo\">\
   <span class=\"fa-stack fa-lg\">\
   <i class=\"fa fa-file-o fa-stack-2x\"></i>\
   <i class=\"fa fa-gears fa-stack-1x\"></i>\
   </span>\
 </button>\
-<button class=\"clean\" id=\"advance_paper\" title=\"Forward Paper\">\
+<button class=\"clean\" id=\"advance_paper\" title=\"Avanzar Papel\">\
   <span class=\"fa-stack fa-lg\">\
   <i class=\"fa fa-file-o fa-stack-2x\"></i>\
   <i class=\"fa fa-step-forward fa-stack-1x\"></i>\
   </span>\
 </button>\
-<button class=\"clean\" id=\"cup_paper\" title=\"Cut Paper\">\
+<button class=\"clean\" id=\"cup_paper\" title=\"Cortar Papel\">\
   <span class=\"fa-stack fa-lg\">\
   <i class=\"fa fa-file-o fa-stack-2x\"></i>\
   <i class=\"fa fa-cut fa-stack-1x\"></i>\
+  </span>\
+</span>\
+<button class=\"close\" id=\"close\" title=\"Cerrar Impresora\">\
+  <span class=\"fa-stack fa-lg\">\
+  <i class=\"fa fa-file-o fa-stack-2x\"></i>\
+  <i class=\"fa fa-close fa-stack-1x\"></i>\
   </span>\
 </span>\
 ";
@@ -237,22 +277,31 @@ function update_view() {
             row.setAttribute('printer_id', p);
             cell1.innerHTML = '<div class="con"></div>'+printer.protocol;
             cell2.innerHTML = buttons_html;
-            var getPrinter = function(e) { return session.printers[e.target.parentNode.parentNode.parentNode.parentNode.getAttribute('printer_id')]; };
+
+            var getPrinter = function(e) {
+              return session.printers[e.target.parentNode.parentNode.parentNode.parentNode.getAttribute('printer_id')];
+            };
 
             cell2.childNodes[0].addEventListener('click', function(e) {
-                getPrinter(e).make_ticket_notacredito(options, ticket, function(res) { console.log(res); });
+                getPrinter(e).make_ticket_notacredito(options, ticket, function(res) {
+                  do_printer_alert("Factura Impresa", res);
+                  console.log(res);
+                });
             });
             cell2.childNodes[1].addEventListener('click', function(e) {
-                getPrinter(e).short_test(function(res) { do_printer_alert("Executed short test", res); });
+                getPrinter(e).short_test(function(res) { do_printer_alert("Test corto Ejecutado", res); });
             });
             cell2.childNodes[2].addEventListener('click', function(e) {
-                getPrinter(e).large_test(function(res) { do_printer_alert("Executed large test.", res); });
+                getPrinter(e).large_test(function(res) { do_printer_alert("Test largo Ejecutado", res); });
             });
             cell2.childNodes[3].addEventListener('click', function(e) {
-                getPrinter(e).advance_paper(1, function(res) { do_printer_alert("Executed advance paper.", res); });
+                getPrinter(e).advance_paper(1, function(res) { do_printer_alert("Avanzar papel Ejecutado", res); });
             });
             cell2.childNodes[4].addEventListener('click', function(e) {
-                getPrinter(e).cut_paper(function(res) { do_printer_alert("Executed cut paper.", res); });
+                getPrinter(e).cut_paper(function(res) { do_printer_alert("Cortar papel Ejecutado", res); });
+            });
+            cell2.childNodes[5].addEventListener('click', function(e) {
+                window.close();
             });
     };
     if (printer_table.rows.length == 0) {

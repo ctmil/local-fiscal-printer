@@ -30,13 +30,6 @@ overflow:scroll;
   font-size:14px;
   letter-spacing:2px;
 }
-#cancel_ticket{
-  width:50px;
-  height:30px;
-  position:absolute;;
-  top:165px;
-  right:30px;
-}
 .no_local_printers{
   color:#222;
   padding:0 5px;
@@ -121,8 +114,6 @@ text-rendering: auto;
 -moz-osx-font-smoothing: grayscale;
 }
 
-
-
 .input-group-addon:first-child {
 border-right: 0;
 }
@@ -200,10 +191,6 @@ text-decoration: none solid rgb(86, 61, 124);
 vertical-align: middle;
 white-space: nowrap;
 width: 182px;
-}
-
-.text-danger {
-    color: rgb(236, 135, 135);
 }
 
 .btn-default {
